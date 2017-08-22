@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # music
 
 > A Vue.js project
@@ -19,3 +20,7 @@ npm run build --report
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+=======
+# Vue-music
+vue2.0 音乐webapp
+>>>>>>> 010040f467cf64f64455b3b2e45a409c7fa540a9
