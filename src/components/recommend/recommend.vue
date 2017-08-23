@@ -1,12 +1,12 @@
 <template>
   <div class="recommend">
-  	<scroll class="recommend-content" :data="recommends">
+  	<scroll class="recommend-content" :data="discList" ref="scroll">
       <div>
     		<div class="slider-wrapper" v-if="recommends.length">
     			<slider>
     				<div v-for="item in recommends">
     					<a :href = "item.linkUrl">
-    						<img :src="item.picUrl" alt="">
+    						<img class="needsclick" @load="loadImage" :src="item.picUrl" alt="">
     					</a>
     				</div>
     			</slider>
@@ -16,7 +16,7 @@
     			<ul>
             <li v-for="item in discList" class="item">
               <div class="icon">
-                <img :src="item.imgurl" alt="" width="60" height="60">
+                <img v-lazy="item.imgurl" alt="" width="60" height="60">
               </div>
               <div class="text">
                 <h2 class="name" v-html="item.creator.name"></h2>
@@ -26,12 +26,16 @@
           </ul>
     		</div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <loading></loading>
+      </div>
   	</scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import Scroll from "base/scroll/scroll.vue";
+import Loading from "base/loading/loading.vue";
 import {getRecommend,getDiscList} from "api/recommend.js";
 import {ERR_OK} from "api/config.js";
 import Slider from "base/slider/slider.vue";
@@ -39,7 +43,10 @@ export default {
   name: 'app',
   created() {
 		this._getRecommend();
-		this._getDiscList();
+    //为看loading效果故意延时
+    setTimeout(()=>{
+		  this._getDiscList();
+    },1000)
   },
   data(){
 		return {
@@ -61,11 +68,18 @@ export default {
 					this.discList = res.data.list;
 				}
   		})
-  	}
+  	},
+    loadImage(){
+      if(!this.checkLoaded){
+        this.$refs.scroll.refresh();
+        this.checkLoaded = true;
+      }
+    }
   },
   components:{
   	Slider,
-    Scroll
+    Scroll,
+    Loading
   }
 }
 </script>
