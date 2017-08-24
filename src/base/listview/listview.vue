@@ -28,6 +28,9 @@
         </li>
       </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
   </scroll>
 </template>
 
@@ -50,6 +53,12 @@
         return this.data.map((group) => {
           return group.title.substr(0,1);
         })
+      },
+      fixedTitle(){
+        if(this.scrollY>0){
+          return ''
+        }
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title:''
       }
     },
     data() {
@@ -110,7 +119,14 @@
         }
       },
       _scrollTo(index) {
-        
+        if(!index && index!==0){
+          return;
+        }
+        if(index < 0){
+          index = 0;
+        }else if(index > this.listHeight.length-2){
+          index = this.listHeight.length-2;
+        }
         this.scrollY = -this.listHeight[index]
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
       }
