@@ -1,0 +1,59 @@
+<template>
+  <div class="song-list">
+   	<ul>
+      <li v-for="song in songs" class="item">
+        <div class="content">
+          <h2 class="name">{{song.name}}</h2>
+          <p class="desc" v-html="getDesc(song)"></p>
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script type="text/ecmascript-6">
+import {mapGetters} from 'vuex'
+import {getSingerDetail} from 'api/singer.js'
+import {ERR_OK} from 'api/config.js'
+import {createSong} from 'common/js/song.js'
+export default {
+  props:{
+    songs:{
+      type:Array,
+      default:[]
+    }
+  },
+  computed:{
+    
+  },
+  methods:{
+    getDesc(song){
+      return `${song.name} • ${song.album}`
+    }
+  }
+}
+</script>
+
+<style scoped lang="stylus" rel="stylesheet/stylus">
+@import "~common/stylus/variable"
+@import "~common/stylus/mixin"
+
+.song-list
+  .item
+    display: flex
+    align-items: center
+    box-sizing: border-box
+    height: 64px
+    font-size: $font-size-medium
+    .content
+      flex: 1
+      line-height: 20px
+      overflow: hidden
+      .name
+        no-wrap()
+        color: $color-text
+      .desc
+        no-wrap()
+        margin-top: 4px
+        color: $color-text-d
+</style>
