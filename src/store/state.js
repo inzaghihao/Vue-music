@@ -1,5 +1,8 @@
 const state = {
-	singer:{}
+	singer:{},
+	playing:false,
+	fullScreen:false,
+	
 }
 
 export default state
