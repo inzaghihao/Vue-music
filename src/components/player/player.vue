@@ -1,6 +1,6 @@
 <template>
-    <div class="player">
-	    <div class="normal-player">
+    <div class="player" v-show="playList.length>0">
+	    <div class="normal-player" v-show="fullScreen">
 	      <div class="background">
 	        <img src="" alt="" width="100%" height="100%">
 	      </div>
@@ -40,7 +40,7 @@
 			    </div>
 			 </div>
    	  </div>
-		  <div class="mini-player">
+		  <div class="mini-player" v-show="!fullScreen">
 		  	<div class="icon">
 		  		<img src="" alt="" width="40" height="40">
 		  	</div>
@@ -57,9 +57,14 @@
 </template>
 
 <script type="text/ecmascript-6">
+import {mapGetters} from 'vuex';
+
 export default {
   computed:{
-
+		...mapGetters([
+			'fullScreen',
+			'playList'
+		])
   }
 }
 </script>
