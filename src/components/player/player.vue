@@ -24,18 +24,25 @@
 		      </div>
 		    </div>
 		    <div class="bottom">
+          <div class="progress-wrapper">
+            <span class="time time-l">{{ format(currentTime) }}</span>
+            <div class="progress-bar-wrapper">
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
+            </div>
+            <span class="time time-r">{{ format(currentSong.duration) }}</span>
+          </div>
 		   	  <div class="operators">
 		        <div class="icon i-left">
 		          <i class="icon-sequence"></i>
 		        </div>
-				    <div class="icon i-left">
-					    <i class="icon-prev"></i>
+				    <div class="icon i-left" :class="disableCls">
+					    <i @click="prev" class="icon-prev"></i>
 					  </div>
-					  <div class="icon i-center" @click="togglePlaying">
-					    <i :class="playIcon"></i>
+					  <div class="icon i-center" :class="disableCls">
+					    <i :class="playIcon" @click="togglePlaying"></i>
 					  </div>
-					  <div class="icon i-right">
-					    <i class="icon-next"></i>
+					  <div class="icon i-right" :class="disableCls">
+					    <i @click="next" class="icon-next"></i>
 					  </div>
 					  <div class="icon i-right">
 					    <i class="icon icon-not-favorite"></i>
@@ -53,22 +60,29 @@
 			  		<h2 class="name" v-html="currentSong.name"></h2>
 			  		<p class="desc" v-html="currentSong.singer"></p>
 			  	</div>
-			  	<div class="control" @click.stop="togglePlaying">
-			  		<i :class="miniIcon"></i>
+			  	<div class="control">
+			  		<i :class="miniIcon" @click.stop="togglePlaying"></i>
 			  	</div>
 			  	<div class="control">
-			  		<i class="icon-play-list"></i>
+			  		<i class="icon-playlist"></i>
 			  	</div>
 			  </div>
 		  </transition>
-		  <audio :src="currentSong.url" ref="audio"></audio>
+		  <audio :src="currentSong.url" ref="audio" @canplay="ready" @error="error" @timeupdate="updateTime"></audio>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import {mapGetters,mapMutations} from 'vuex';
+import progressBar from 'base/progress-bar/progress-bar.vue';
 
 export default {
+	data(){
+		return {
+			songReady:false,
+      currentTime:0
+		}
+	},
   computed:{
   	playIcon(){
 			return this.playing? 'icon-pause':'icon-play'
@@ -79,12 +93,20 @@ export default {
   	cdCls(){
 			return this.playing? 'play':'play pause'
   	},
+  	disableCls(){
+			return this.songReady ? '' : 'disable'
+		},
+    percent(){
+      return this.currentTime / this.currentSong.duration
+    },
 		...mapGetters([
 			'fullScreen',
 			'playList',
 			'currentSong',
-			'playing'
+			'playing',
+			'currentIndex'
 		])
+		
   },
   methods:{
   	back(){
@@ -95,11 +117,73 @@ export default {
   	},
   	...mapMutations({
   		setFullScreen:"SET_FULL_SCREEN",
-  		setPlayingState:'SET_PLAYING_STATE'
+  		setPlayingState:'SET_PLAYING_STATE',
+  		setCurrentIndex:'SET_CURRENT_INDEX'
   	}),
   	togglePlaying(){
+  		if(!this.songReady){
+  			return;
+  		}	
   		this.setPlayingState(!this.playing);
-  	}
+  	},
+  	prev(){
+	  	if(!this.songReady){
+	  		return;
+	  	}
+			let index = this.currentIndex - 1;
+			if(index === -1){
+				index = this.playList.length-1;
+			}
+			this.setCurrentIndex(index);
+			if(!this.playing){
+				this.togglePlaying();
+			}
+			this.songReady = false;
+  	},
+  	next(){
+  		if(!this.songReady){
+  			return;
+  		}
+			let index = this.currentIndex + 1;
+			if(index === this.playList.length){
+				index = 0;
+			}
+			this.setCurrentIndex(index);
+			if(!this.playing){
+				this.togglePlaying();
+			}
+			this.songReady = false;
+  	},
+  	ready(){
+  		this.songReady = true;
+  	},
+  	error(){
+  		this.songReady = true;
+  	},
+    updateTime(e){
+      this.currentTime = e.target.currentTime;
+    },
+    format(interval){
+      interval = interval | 0;
+      const minute = interval/60 | 0;
+      const second = this._pad(interval % 60);
+      return `${minute}:${second}`;      
+    },
+    onProgressBarChange(percent){
+      this.$refs.audio.currentTime = this.currentSong.duration * percent;
+      if(!this.playing){
+        this.togglePlaying();
+      }
+    },
+    _pad(num,n=2){
+      let len = num.toString().length;
+      while(len<n){
+        num = '0' + num;
+        len ++;
+      }
+      return num;
+    },
+
   },
   watch:{
   	currentSong(){
@@ -113,6 +197,9 @@ export default {
   			newPlaying ? audio.play():audio.pause();
   		})
   	}
+  },
+  components:{
+    progressBar
   }
 }
 </script>
