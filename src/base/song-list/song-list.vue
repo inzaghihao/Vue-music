@@ -12,10 +12,6 @@
 </template>
 
 <script type="text/ecmascript-6">
-import {mapGetters} from 'vuex'
-import {getSingerDetail} from 'api/singer.js'
-import {ERR_OK} from 'api/config.js'
-import {createSong} from 'common/js/song.js'
 export default {
   props:{
     songs:{
