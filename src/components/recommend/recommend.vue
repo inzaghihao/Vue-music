@@ -41,6 +41,8 @@ import {getRecommend,getDiscList} from "api/recommend.js";
 import {ERR_OK} from "api/config.js";
 import Slider from "base/slider/slider.vue";
 import {playlistMixin} from 'common/js/mixin.js'
+import {mapMutations} from 'vuex'
+
 export default {
   mixins:[playlistMixin],
   name: 'app',
@@ -87,7 +89,11 @@ export default {
       this.$router.push({
         path:`/recommend/${item.dissid}`
       })
-    }
+      this.setDisc(item);
+    },
+    ...mapMutations({
+      setDisc : 'SET_DISC'
+    })
   },
   components:{
   	Slider,

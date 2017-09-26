@@ -16,7 +16,7 @@
     <div class="bg-layer" ref="layer"></div>
     <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" class="list" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs" @select="selectItem"></song-list>
+        <song-list :rank="rank" :songs="songs" @select="selectItem"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
         <loading></loading>
@@ -48,6 +48,10 @@ export default {
     title:{
       type:String,
       default:''
+    },
+    rank:{
+      type:Boolean,
+      default:false
     }
   },
   created(){
@@ -56,7 +60,7 @@ export default {
   },
   data(){
     return {
-      scrollY:0
+      scrollY:0,
     }
   },
   computed:{
